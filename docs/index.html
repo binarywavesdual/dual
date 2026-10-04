@@ -53,7 +53,7 @@
   <p class="tag">SMS and free online chat, in one app.</p>
 
   <a class="btn" href="https://github.com/binarywavesdual/dual/releases/latest/download/Dual.apk">Download Dual for Android</a>
-  <p class="meta">Version 1.3.1 &middot; 51.7 MB &middot; updated 2 October 2026<br>No account needed to download.</p>
+  <p class="meta">Version <span id="v-name">1.3.4</span> &middot; <span id="v-size">52.1</span> MB &middot; updated <span id="v-date">4 October 2026</span><br>No account needed to download.</p>
 
   <div class="card">
     <h2>How to install</h2>
@@ -82,7 +82,7 @@
     <p style="margin-top:0">Dual is made by BinaryWaves. It is not on the Play Store yet, so Android shows warnings it shows for every app installed from a file. Dual keeps your text messages on your phone. To check that the file you downloaded is the real one:</p>
     <details>
       <summary>Show the file fingerprints</summary>
-      <p class="note">Download file (SHA-256):<br><code>b7b586ef8712eee3346e92d2d226c99d583c7468a4dbc99eb429a07809d98a68</code></p>
+      <p class="note">Download file (SHA-256):<br><code id="v-sha">940558516f6c653a23c866c37e27fff82b4600ec87232547a315ef12185ff2e8</code></p>
       <p class="note">Signing certificate (SHA-256):<br><code>f328bbafa6ed1bcfdfb8691e66bf018c0b04ed604aa9959193e77a3a1c519866</code></p>
     </details>
   </div>
@@ -105,5 +105,26 @@
 
   <footer>Dual &middot; Developed by BinaryWaves</footer>
 </main>
+<script>
+// Keeps the version, size, date and fingerprint current from latest.json, so the page
+// is right the moment a release is published, without uploading this page again. If
+// the browser cannot read it, the values written when the page was made stay.
+(function () {
+  function set(id, value) { var e = document.getElementById(id); if (e && value) e.textContent = value; }
+  fetch("https://github.com/binarywavesdual/dual/releases/latest/download/latest.json", { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) {
+      if (!j || !j.versionName) return;
+      set("v-name", j.versionName);
+      if (j.sizeBytes) set("v-size", (j.sizeBytes / 1048576).toFixed(1));
+      if (j.publishedAt) {
+        var d = new Date(j.publishedAt);
+        if (!isNaN(d)) set("v-date", d.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }));
+      }
+      set("v-sha", j.apkSha256);
+    })
+    .catch(function () {});
+})();
+</script>
 </body>
 </html>

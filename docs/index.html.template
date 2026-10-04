@@ -53,7 +53,7 @@
   <p class="tag">SMS and free online chat, in one app.</p>
 
   <a class="btn" href="{{DOWNLOAD_URL}}">Download Dual for Android</a>
-  <p class="meta">Version {{VERSION_NAME}} &middot; {{APK_SIZE_MB}} MB &middot; updated {{DATE}}<br>No account needed to download.</p>
+  <p class="meta">Version <span id="v-name">{{VERSION_NAME}}</span> &middot; <span id="v-size">{{APK_SIZE_MB}}</span> MB &middot; updated <span id="v-date">{{DATE}}</span><br>No account needed to download.</p>
 
   <div class="card">
     <h2>How to install</h2>
@@ -82,7 +82,7 @@
     <p style="margin-top:0">Dual is made by BinaryWaves. It is not on the Play Store yet, so Android shows warnings it shows for every app installed from a file. Dual keeps your text messages on your phone. To check that the file you downloaded is the real one:</p>
     <details>
       <summary>Show the file fingerprints</summary>
-      <p class="note">Download file (SHA-256):<br><code>{{APK_SHA256}}</code></p>
+      <p class="note">Download file (SHA-256):<br><code id="v-sha">{{APK_SHA256}}</code></p>
       <p class="note">Signing certificate (SHA-256):<br><code>{{CERT_SHA256}}</code></p>
     </details>
   </div>
@@ -105,5 +105,26 @@
 
   <footer>Dual &middot; Developed by BinaryWaves</footer>
 </main>
+<script>
+// Keeps the version, size, date and fingerprint current from latest.json, so the page
+// is right the moment a release is published, without uploading this page again. If
+// the browser cannot read it, the values written when the page was made stay.
+(function () {
+  function set(id, value) { var e = document.getElementById(id); if (e && value) e.textContent = value; }
+  fetch("{{UPDATE_URL}}", { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) {
+      if (!j || !j.versionName) return;
+      set("v-name", j.versionName);
+      if (j.sizeBytes) set("v-size", (j.sizeBytes / 1048576).toFixed(1));
+      if (j.publishedAt) {
+        var d = new Date(j.publishedAt);
+        if (!isNaN(d)) set("v-date", d.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }));
+      }
+      set("v-sha", j.apkSha256);
+    })
+    .catch(function () {});
+})();
+</script>
 </body>
 </html>
